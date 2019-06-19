@@ -5,13 +5,14 @@ from lxml import etree
 import snp
 import publication
 import db
+import time
 
 """
 Finds all rsids that are explicitly cited in pubmed
 and returns a list
 """
 def get_complete_rsids():
-    results = ncbiutils.esearch(db="snp", retmode="json", retmax=100, retstart=0, term='snp_pubmed_cited[sb]', api_key="7c0213f7c513fa71fe2cb65b4dfefa76fb09")
+    results = ncbiutils.esearch(db="snp", retmode="json", retmax=200000, retstart=0, term='snp_pubmed_cited[sb]', api_key="7c0213f7c513fa71fe2cb65b4dfefa76fb09")
     rsidlist = results["esearchresult"]["idlist"]
     return(rsidlist)
 
@@ -43,13 +44,15 @@ def get_publication(pmid):
     titles = []
     for t in xml.xpath('//ArticleTitle'):
         titles.append(t.text)
-    print(titles)
-    print(abstracts)
-    titles = " ".join(titles)
-    abstracts = " ".join(abstracts)
+    if len(titles) > 0 and titles[0] != None:
+        titles = " ".join(titles)
+    else:
+        titles = ""
+    if len(abstracts) > 0 and abstracts[0] != None:
+        abstracts = " ".join(abstracts)
+    else:
+        abstracts = ""
     items = { "title": titles, "abstract": abstracts, }
-    print(pmid)
-    print(items)
     return(items)
 
 """
@@ -64,20 +67,27 @@ def init_rsids():
         if len(pmids) > 0:
             a_snp = snp.Snp(id=rsid, publications=pmids)
             snps.append(a_snp)
-        print(len(snps))
     return(snps)
         
 def init_pubs(snps):
     return()
 
 def init_db(conn):
+    p_snps = 0
+    p_pubs = 0
     snps = get_complete_rsids()
     for s in snps:
+        time.sleep(.1)
         pubs = get_pmids(s)
-        for p in pubs:
-            db.add_snp(conn, s, p)
-            info = get_publication(p)
-            db.add_publication(conn, id=p, title=info["title"], abstract=info["abstract"])
+        if len(pubs) > 0:
+            p_snps = p_snps + 1
+            print("Processed {} snps".format(p_snps))
+            for p in pubs:
+                db.add_snp(conn, s, p)
+                info = get_publication(p)
+                db.add_publication(conn, id=p, title=info["title"], abstract=info["abstract"])
+                p_pubs = p_pubs + 1
+                print("Procssed {} pubs".format(p_pubs))
     return()
 
 def main():
@@ -89,3 +99,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
