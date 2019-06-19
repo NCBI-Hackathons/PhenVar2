@@ -4,7 +4,7 @@ import ncbiutils
 from lxml import etree
 import snp
 import publication
-import db
+import db2
 import time
 
 """
@@ -92,10 +92,13 @@ def init_db(conn):
     return()
 
 def main():
-    conn = db.connect("db.sqlite3")
-    db.create_tables(conn)
-    init_db(conn)
-    db.close(conn)
+    # conn = db.connect("db.sqlite3")
+    # db.create_tables(conn)
+    # init_db(conn)
+    # db.close(conn)
+    engine, session = db2.create("db.sqlite3")
+    db2.create_tables(engine)
+    init_db(session)
     return()
 
 if __name__ == '__main__':
