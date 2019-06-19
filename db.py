@@ -1,6 +1,6 @@
 import sqlite3
-
-conn = sqlite3.connect("phenvar.db")
+def establishConnection(db):
+    conn = sqlite3.connect(db)
 
 def createTables(conn):
     c = conn.cursor()
@@ -18,7 +18,6 @@ def addPublicationsRow(conn, id, title, abstract):
 
     c.execute("INSERT INTO publications VALUES (?, ?, ?)", (id, title, abstract))
 
-
-#createTables(conn)
-conn.commit()
-conn.close()
+def commitAndClose(conn):
+    conn.commit()
+    conn.close()
