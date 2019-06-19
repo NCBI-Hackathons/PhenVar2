@@ -31,6 +31,14 @@ def check_publication(conn, id):
     else:
         return(True)
 
+def check_snp(conn, id, pub):
+    c = conn.cursor()
+    c.execute("SELECT rowid FROM snps_publications WHERE rsid = ? AND publication_id = ?", (id, pub,))
+    if len(c.fetchall()) == 0:
+        return(False)
+    else:
+        return(True)
+
 def close(conn):
     conn.close()
     return()

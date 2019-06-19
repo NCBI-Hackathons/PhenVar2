@@ -83,7 +83,8 @@ def init_db(conn):
             p_snps = p_snps + 1
             print("Processed {} snps".format(p_snps))
             for p in pubs:
-                db.add_snp(conn, s, p)
+                if not db.check_snp(conn=conn, id=s, pub=p):
+                    db.add_snp(conn, s, p)
                 if not db.check_publication(conn=conn, id=p):
                     info = get_publication(p)
                     db.add_publication(conn, id=p, title=info["title"], abstract=info["abstract"])
