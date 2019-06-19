@@ -23,6 +23,14 @@ def add_publication(conn, id, title, abstract):
     conn.commit()
     return()
 
+def check_publication(conn, id):
+    c = conn.cursor()
+    c.execute("SELECT rowid FROM publications WHERE id = ?", (id,))
+    if len(c.fetchall()) == 0:
+        return(False)
+    else:
+        return(True)
+
 def close(conn):
     conn.close()
     return()
