@@ -19,10 +19,8 @@ Generates a list of PMIDs that are explicitly cite a given rsid
 """
 def get_pmids(rsid):
     searchterm = rsid + "+AND+pubmed_snp_cited[sb]"
-    print(searchterm)
     results = ncbiutils.esearch(db="pubmed", retmode="json", retmax=200000, restart=0, term=searchterm, api_key="7c0213f7c513fa71fe2cb65b4dfefa76fb09")
     pmidlist = results["esearchresult"]["idlist"]
-    print(pmidlist)
     return(pmidlist)
 
 
@@ -35,7 +33,6 @@ def get_abstract(pmid):
     abstracts = []
     for a in xml.xpath('//AbstractText'):
         abstracts.append(a.text)
-    print(abstracts)
     return()
 
 def main():
