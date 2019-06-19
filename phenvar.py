@@ -4,6 +4,7 @@ import ncbiutils
 from lxml import etree
 import snp
 import publication
+import db
 
 """
 Finds all rsids that are explicitly cited in pubmed

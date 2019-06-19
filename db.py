@@ -2,6 +2,7 @@ import sqlite3
 
 def connect(db):
     conn = sqlite3.connect(db)
+    return(conn)
 
 def create_tables(conn):
     c = conn.cursor()
