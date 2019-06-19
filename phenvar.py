@@ -11,17 +11,15 @@ Finds all rsids that are explicitly cited in pubmed
 and returns a list
 """
 def get_complete_rsids():
-    results = ncbiutils.esearch(db="snp", retmode="json", retmax=200000, retstart=0, term='snp_pubmed_cited[sb]', api_key="7c0213f7c513fa71fe2cb65b4dfefa76fb09")
+    results = ncbiutils.esearch(db="snp", retmode="json", retmax=500, retstart=0, term='snp_pubmed_cited[sb]', api_key="7c0213f7c513fa71fe2cb65b4dfefa76fb09")
     rsidlist = results["esearchresult"]["idlist"]
-    for x in range(0, len(rsidlist)):
-        rsidlist[x] = "rs" + rsidlist[x]
     return(rsidlist)
 
 """
 Generates a list of PMIDs that are explicitly cite a given rsid
 """
 def get_pmids(rsid):
-    searchterm = rsid + "+AND+pubmed_snp_cited[sb]"
+    searchterm = "rs" + rsid + "+AND+pubmed_snp_cited[sb]"
     results = ncbiutils.esearch(db="pubmed", retmode="json", retmax=200000, restart=0, term=searchterm, api_key="7c0213f7c513fa71fe2cb65b4dfefa76fb09")
     pmidlist = results["esearchresult"]["idlist"]
     return(pmidlist)
@@ -57,8 +55,17 @@ def init_rsids():
         print(len(snps))
     return(snps)
         
+def init_pubs(snps):
+    return()
+
 def main():
     snps = init_rsids()
+    conn = db.connect("db.sqlite3")
+    db.create_tables(conn)
+    for item in snps:
+        for pub in item.publications:
+            db.add_snp(conn, item.id, pub)
+    db.close(conn)
     return()
 
 if __name__ == '__main__':
