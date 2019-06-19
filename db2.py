@@ -14,7 +14,7 @@ class Publication(Base):
     rsids = Column(Integer)
 
 class Snp(Base):
-    __tablename = 'snp'
+    __tablename__ = 'snp'
     id = Column(Integer, primary_key = True)
     publications = Column(Integer, ForeignKey('publication.id', primary_key = True))
 
