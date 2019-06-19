@@ -84,8 +84,9 @@ def init_db(conn):
             print("Processed {} snps".format(p_snps))
             for p in pubs:
                 db.add_snp(conn, s, p)
-                info = get_publication(p)
-                db.add_publication(conn, id=p, title=info["title"], abstract=info["abstract"])
+                if not db.check_publication(conn=conn, id=p):
+                    info = get_publication(p)
+                    db.add_publication(conn, id=p, title=info["title"], abstract=info["abstract"])
                 p_pubs = p_pubs + 1
                 print("Procssed {} pubs".format(p_pubs))
     return()
