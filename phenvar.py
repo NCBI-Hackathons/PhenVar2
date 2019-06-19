@@ -89,7 +89,7 @@ def init_db(conn):
                     info = get_publication(p)
                     db.add_publication(conn, id=p, title=info["title"], abstract=info["abstract"])
                 p_pubs = p_pubs + 1
-                print("Procssed {} pubs".format(p_pubs))
+                print("Processed {} pubs".format(p_pubs))
     return()
 
 def main():
@@ -101,4 +101,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
