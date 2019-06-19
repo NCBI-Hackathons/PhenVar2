@@ -44,11 +44,11 @@ def get_publication(pmid):
     titles = []
     for t in xml.xpath('//ArticleTitle'):
         titles.append(t.text)
-    if len(titles) > 0 and titles[0] != None:
+    if len(titles) > 0 and not None in titles:
         titles = " ".join(titles)
     else:
         titles = ""
-    if len(abstracts) > 0 and abstracts[0] != None:
+    if len(abstracts) > 0 and not None in abstracts:
         abstracts = " ".join(abstracts)
     else:
         abstracts = ""
