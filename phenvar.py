@@ -28,8 +28,14 @@ def get_pmids(rsid):
 """
 Takes a pmid and returns the abstract text
 """
-def get_abstract(pmid):
+def get_publication(pmid):
     raw = ncbiutils.efetch(db="pubmed", id=pmid, rettype="abstract", api_key="7c0213f7c513fa71fe2cb65b4dfefa76fb09")
+    raw = raw.replace("<i>", "")
+    raw = raw.replace("</i>", "")
+    raw = raw.replace("<b>", "")
+    raw = raw.replace("</b>", "")
+    raw = raw.replace("<u>", "")
+    raw = raw.replace("</u>", "")
     xml = etree.fromstring(raw)
     abstracts = []
     for a in xml.xpath('//AbstractText'):
@@ -38,7 +44,13 @@ def get_abstract(pmid):
     for t in xml.xpath('//ArticleTitle'):
         titles.append(t.text)
     print(titles)
-    return()
+    print(abstracts)
+    titles = " ".join(titles)
+    abstracts = " ".join(abstracts)
+    items = { "title": titles, "abstract": abstracts, }
+    print(pmid)
+    print(items)
+    return(items)
 
 """
 Initializes Snp objects and creates a list of them.  This list
@@ -64,6 +76,8 @@ def main():
     db.create_tables(conn)
     for item in snps:
         for pub in item.publications:
+            info = get_publication(pub)
+            db.add_publication(conn, id=pub, title=info["title"], abstract=info["abstract"])
             db.add_snp(conn, item.id, pub)
     db.close(conn)
     return()

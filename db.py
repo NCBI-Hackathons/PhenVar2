@@ -13,7 +13,6 @@ def create_tables(conn):
 
 def add_snp(conn, rsid, publication_id):
     c = conn.cursor()
-
     c.execute("INSERT OR IGNORE INTO snps_publications VALUES (?, ?)", (rsid, publication_id))
     conn.commit()
     return()
