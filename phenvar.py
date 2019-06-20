@@ -2,8 +2,6 @@
 
 import ncbiutils
 from lxml import etree
-import snp
-import publication
 import db
 import time
 
@@ -12,7 +10,7 @@ Finds all rsids that are explicitly cited in pubmed
 and returns a list
 """
 def get_complete_rsids():
-    results = ncbiutils.esearch(db="snp", retmode="json", retmax=200000, retstart=0, term='snp_pubmed_cited[sb]', api_key="7c0213f7c513fa71fe2cb65b4dfefa76fb09")
+    results = ncbiutils.esearch(db="snp", retmode="json", retmax=100, retstart=0, term='snp_pubmed_cited[sb]', api_key="7c0213f7c513fa71fe2cb65b4dfefa76fb09")
     rsidlist = results["esearchresult"]["idlist"]
     return(rsidlist)
 
@@ -44,60 +42,19 @@ def get_publication(pmid):
     titles = []
     for t in xml.xpath('//ArticleTitle'):
         titles.append(t.text)
-    if len(titles) > 0 and titles[0] != None:
+    if len(titles) > 0 and not None in titles:
         titles = " ".join(titles)
     else:
         titles = ""
-    if len(abstracts) > 0 and abstracts[0] != None:
+    if len(abstracts) > 0 and not None in abstracts:
         abstracts = " ".join(abstracts)
     else:
         abstracts = ""
     items = { "title": titles, "abstract": abstracts, }
     return(items)
 
-"""
-Initializes Snp objects and creates a list of them.  This list
-can be later used to initilize a database or other magic
-"""
-def init_rsids():
-    snps = []
-    rsids = get_complete_rsids()
-    for rsid in rsids:
-        pmids = get_pmids(rsid)
-        if len(pmids) > 0:
-            a_snp = snp.Snp(id=rsid, publications=pmids)
-            snps.append(a_snp)
-    return(snps)
-        
-def init_pubs(snps):
-    return()
-
-def init_db(conn):
-    p_snps = 0
-    p_pubs = 0
-    snps = get_complete_rsids()
-    for s in snps:
-        time.sleep(.1)
-        pubs = get_pmids(s)
-        if len(pubs) > 0:
-            p_snps = p_snps + 1
-            print("Processed {} snps".format(p_snps))
-            for p in pubs:
-                db.add_snp(conn, s, p)
-                if not db.check_publication(conn=conn, id=p):
-                    info = get_publication(p)
-                    db.add_publication(conn, id=p, title=info["title"], abstract=info["abstract"])
-                p_pubs = p_pubs + 1
-                print("Procssed {} pubs".format(p_pubs))
-    return()
-
 def main():
-    conn = db.connect("db.sqlite3")
-    db.create_tables(conn)
-    init_db(conn)
-    db.close(conn)
     return()
 
 if __name__ == '__main__':
     main()
-
