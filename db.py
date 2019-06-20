@@ -57,7 +57,8 @@ def check_publication(session, id):
 
 def check_snp(session, id, pub):
     # snp = session.query([publication].where(db.and_(publication.columns.id == pub, publication.columns.rsids == id)).scalar()
-    snp = session.query(Snp).filter_by(id=id, publications=pub).scalar()
+    snp = session.query(Snp).filter_by(rsid=id).filter_by(publications=pub).scalar()
+    # snp = session.query(Snp).filter(and_(rsid=id, publications == pub)).scalar()
     if snp == None:
         return(False)
     return(True)
