@@ -49,18 +49,18 @@ def add_publication(session, id, title, abstract):
     return()
 
 def check_publication(session, id):
-    publication = session.query(Publication).filter(Publication.id == id)
-    if publication:
+    # publication = session.query(Publication).filter(Publication.id == id)
+    publication = session.query(Publication).filter_by(id=id).scalar()
+    if publication == None:
         return(True)
     return(False)
 
-def check_snp(conn, id, pub):
-    c = conn.cursor()
-    c.execute("SELECT rowid FROM snps_publications WHERE rsid = ? AND publication_id = ?", (id, pub,))
-    if len(c.fetchall()) == 0:
+def check_snp(session, id, pub):
+    # snp = session.query([publication].where(db.and_(publication.columns.id == pub, publication.columns.rsids == id)).scalar()
+    snp = session.query(Snp).filter_by(id=id, publications=pub).scalar()
+    if snp == None:
         return(False)
-    else:
-        return(True)
+    return(True)
 
 def close(conn):
     conn.close()
