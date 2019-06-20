@@ -2,8 +2,6 @@
 
 import ncbiutils
 from lxml import etree
-import snp
-import publication
 import db
 import time
 
