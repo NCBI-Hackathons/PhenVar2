@@ -56,12 +56,15 @@ def check_publication(session, id):
     return(False)
 
 def check_snp(session, id, pub):
-    # snp = session.query([publication].where(db.and_(publication.columns.id == pub, publication.columns.rsids == id)).scalar()
     snp = session.query(Snp).filter_by(rsid=id).filter_by(publications=pub).scalar()
-    # snp = session.query(Snp).filter(and_(rsid=id, publications == pub)).scalar()
     if snp == None:
         return(False)
     return(True)
+
+def get_snp_rows(session):
+    query = session.query(Snp)
+    rows = query.all()
+    return(rows)
 
 def close(conn):
     conn.close()
