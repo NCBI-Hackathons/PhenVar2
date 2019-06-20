@@ -2,7 +2,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, Boolean
 from sqlalchemy import Index
 from sqlalchemy.orm import relationship, backref, sessionmaker
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 
 Base = declarative_base()
 
@@ -54,31 +54,52 @@ def create_tables(engine):
 
 def add_snp(session, rsid, publication_id):
     snp = Snp(rsid = rsid, publications = publication_id)
+    print("Adding snp: ", rsid, "|", publication_id)
     session.add(snp)
     session.commit()
     return()
 
 def add_publication(session, id, title, abstract):
-    publication = Publication(id = id, title = title, abstract = abstract)
+    publication = Publication(rsids = id, title = title, abstract = abstract)
+    print("Adding publication: ", id, "|", title, "|", abstract)
     session.add(publication)
     session.commit()
     return()
 
 def check_publication(session, id):
     # publication = session.query(Publication).filter(Publication.id == id)
-    publication = session.query(Publication).filter_by(id=id).scalar()
+    publication = session.query(Publication).filter_by(rsids=id).scalar()
     if publication == None:
-        return(True)
-    return(False)
+        return(False)
+    return(True)
 
 def check_snp(session, id, pub):
-    # snp = session.query([publication].where(db.and_(publication.columns.id == pub, publication.columns.rsids == id)).scalar()
     snp = session.query(Snp).filter_by(rsid=id).filter_by(publications=pub).scalar()
-    # snp = session.query(Snp).filter(and_(rsid=id, publications == pub)).scalar()
     if snp == None:
         print("snp doesn't exist")
         return(False)
     return(True)
+
+def get_snp_rows(session):
+    query = session.query(Snp)
+    rows = query.all()
+    return(rows)
+
+def result_dict(r):
+    return dict(zip(r.keys(), r))
+
+def result_dicts(rs):
+    return list(map(result_dict, rs))
+
+def table_dump(session, table):
+    if table == 'publication':
+        stmt = select('*').select_from(Publication)
+    elif table == 'snp':
+        stmt = select('*').select_from(Snp)
+    result = session.execute(stmt).fetchall()
+    print(result_dicts(result))
+    return()
+
 
 def close(conn):
     conn.close()
