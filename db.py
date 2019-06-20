@@ -44,7 +44,7 @@ def add_snp(session, rsid, publication_id):
     return()
 
 def add_publication(session, id, title, abstract):
-    publication = Publication(id = id, title = title, abstract = abstract)
+    publication = Publication(rsids = id, title = title, abstract = abstract)
     print("Adding publication: ", id, "|", title, "|", abstract)
     session.add(publication)
     session.commit()
@@ -52,10 +52,10 @@ def add_publication(session, id, title, abstract):
 
 def check_publication(session, id):
     # publication = session.query(Publication).filter(Publication.id == id)
-    publication = session.query(Publication).filter_by(id=id).scalar()
+    publication = session.query(Publication).filter_by(rsids=id).scalar()
     if publication == None:
-        return(True)
-    return(False)
+        return(False)
+    return(True)
 
 def check_snp(session, id, pub):
     snp = session.query(Snp).filter_by(rsid=id).filter_by(publications=pub).scalar()
