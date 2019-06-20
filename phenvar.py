@@ -12,7 +12,7 @@ Finds all rsids that are explicitly cited in pubmed
 and returns a list
 """
 def get_complete_rsids():
-    results = ncbiutils.esearch(db="snp", retmode="json", retmax=200000, retstart=0, term='snp_pubmed_cited[sb]', api_key="7c0213f7c513fa71fe2cb65b4dfefa76fb09")
+    results = ncbiutils.esearch(db="snp", retmode="json", retmax=100, retstart=0, term='snp_pubmed_cited[sb]', api_key="7c0213f7c513fa71fe2cb65b4dfefa76fb09")
     rsidlist = results["esearchresult"]["idlist"]
     return(rsidlist)
 
@@ -68,7 +68,7 @@ def init_rsids():
             a_snp = snp.Snp(id=rsid, publications=pmids)
             snps.append(a_snp)
     return(snps)
-        
+
 def init_pubs(snps):
     return()
 
@@ -93,10 +93,6 @@ def init_db(conn):
     return()
 
 def main():
-    conn = db.connect("db.sqlite3")
-    db.create_tables(conn)
-    init_db(conn)
-    db.close(conn)
     return()
 
 if __name__ == '__main__':
