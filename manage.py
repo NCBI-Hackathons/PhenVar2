@@ -12,17 +12,19 @@ help_text = """USAGE:
     - initialize    creates tables in database, should only be run once
     - update_snps   gets rsids and populates database
     - update_publications   gets publications and populates database
+    - dump_publication  prints publication table
+    - dump_snp  prints snp table
 """
 
 def help():
     print(help_text)
 
 def initialize():
-    engine, session = db.create("sqlite:///db.sqlite3")
-    db.create_tables(engine)
-    update_snps(session)
-    update_publications(session)
-    db.close(session)
+    # engine, session = db.create("sqlite:///db.sqlite3")
+    # db.create_tables(engine)
+    update_snps()
+    update_publications()
+    # db.close(session)
 
 def init_session():
     engine, session = db.create("sqlite:///db.sqlite3")
@@ -32,14 +34,17 @@ def init_session():
 def dump_publication():
     session = init_session()
     db.table_dump(session, 'publication')
+    db.close(session)
     return()
 
 def dump_snp():
     session = init_session()
     db.table_dump(session, 'snp')
+    db.close(session)
     return()
 
-def update_snps(session):
+def update_snps():
+    session = init_session()
     p_snps = 0
     snps = get_complete_rsids()
     # for each rsid, get pmids
@@ -54,10 +59,11 @@ def update_snps(session):
                 if not db.check_snp(session=session, id=s, pub=p):
                     db.add_snp(session, s, p)
                     # print("snp not in database; adding")
-
+    db.close(session)
     return()
 
-def update_publications(session):
+def update_publications():
+    session = init_session()
     p_pubs = 0
     # for row in snps_publications get pmid
     rows = db.get_snp_rows(session)
@@ -70,6 +76,7 @@ def update_publications(session):
             # print("publication not in database; adding")
         p_pubs += 1
         print("Processed {} pubs".format(p_pubs))
+    db.close(session)
     return()
 
 def old_initialize():
