@@ -68,28 +68,10 @@ def init_rsids():
             a_snp = snp.Snp(id=rsid, publications=pmids)
             snps.append(a_snp)
     return(snps)
-        
+
 def init_pubs(snps):
     return()
 
-def init_db(conn):
-    p_snps = 0
-    p_pubs = 0
-    snps = get_complete_rsids()
-    for s in snps:
-        time.sleep(.1)
-        pubs = get_pmids(s)
-        if len(pubs) > 0:
-            p_snps = p_snps + 1
-            print("Processed {} snps".format(p_snps))
-            for p in pubs:
-                db2.add_snp(conn, s, p)
-                if not db2.check_publication(session=conn, id=p):
-                    info = get_publication(p)
-                    db2.add_publication(conn, id=p, title=info["title"], abstract=info["abstract"])
-                p_pubs = p_pubs + 1
-                print("Procssed {} pubs".format(p_pubs))
-    return()
 
 def main():
     engine, session = db2.create("sqlite:///db.sqlite3")
@@ -99,4 +81,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
