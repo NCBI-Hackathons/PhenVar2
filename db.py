@@ -23,13 +23,19 @@ def add_publication(conn, id, title, abstract):
     conn.commit()
     return()
 
-def check_publication(conn, id):
-    c = conn.cursor()
-    c.execute("SELECT rowid FROM publications WHERE id = ?", (id,))
-    if len(c.fetchall()) == 0:
-        return(False)
-    else:
+def check_publication(session, id):
+    # publication = session.query(Publication).filter(Publication.id == id)
+    publication = session.query(Publication).filter_by(id=id).scalar()
+    if publication == None:
         return(True)
+    return(False)
+
+def check_snp(session, id, pub):
+    # snp = session.query([publication].where(db.and_(publication.columns.id == pub, publication.columns.rsids == id)).scalar()
+    snp = session.query(Snp).filter_by(id=id, publications=pub).scalar()
+    if snp == None:
+        return(False)
+    return(True)
 
 def close(conn):
     conn.close()
