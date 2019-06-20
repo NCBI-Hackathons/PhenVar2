@@ -15,8 +15,9 @@ class Publication(Base):
 
 class Snp(Base):
     __tablename__ = 'snp'
-    id = Column(Integer, primary_key = True)
-    publications = Column(Integer, ForeignKey('publication.id', primary_key = True))
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    rsid = Column(Integer)
+    publications = Column(Integer, ForeignKey('publication.id'))
 
 def create(database):
     # an engine that the session will use for resources
@@ -36,7 +37,7 @@ def create_tables(engine):
     return
 
 def add_snp(session, rsid, publication_id):
-    snp = Snp(id = rsid, publications = publication_id)
+    snp = Snp(rsid = rsid, publications = publication_id)
     session.add(snp)
     session.commit()
     return
@@ -49,9 +50,9 @@ def add_publication(session, id, title, abstract):
 
 def check_publication(session, id):
     publication = session.query(Publication).filter(Publication.id == id)
-    for row in publication:
-        print(row.id)
-    return
+    if publication:
+        return(True)
+    return(False)
 
 def close(conn):
     conn.close()

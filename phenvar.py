@@ -92,11 +92,7 @@ def init_db(conn):
     return()
 
 def main():
-    # conn = db.connect("db.sqlite3")
-    # db.create_tables(conn)
-    # init_db(conn)
-    # db.close(conn)
-    engine, session = db2.create("db.sqlite3")
+    engine, session = db2.create("sqlite:///db.sqlite3")
     db2.create_tables(engine)
     init_db(session)
     return()
