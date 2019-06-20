@@ -4,7 +4,7 @@ import ncbiutils
 from lxml import etree
 import snp
 import publication
-import db2
+import db
 import time
 
 """
@@ -12,7 +12,7 @@ Finds all rsids that are explicitly cited in pubmed
 and returns a list
 """
 def get_complete_rsids():
-    results = ncbiutils.esearch(db="snp", retmode="json", retmax=200, retstart=0, term='snp_pubmed_cited[sb]', api_key="7c0213f7c513fa71fe2cb65b4dfefa76fb09")
+    results = ncbiutils.esearch(db="snp", retmode="json", retmax=100, retstart=0, term='snp_pubmed_cited[sb]', api_key="7c0213f7c513fa71fe2cb65b4dfefa76fb09")
     rsidlist = results["esearchresult"]["idlist"]
     return(rsidlist)
 
@@ -74,9 +74,6 @@ def init_pubs(snps):
 
 
 def main():
-    engine, session = db2.create("sqlite:///db.sqlite3")
-    db2.create_tables(engine)
-    init_db(session)
     return()
 
 if __name__ == '__main__':
