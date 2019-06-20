@@ -34,7 +34,7 @@ def initialize():
                     info = get_publication(p)
                     db.add_publication(session, id=p, title=info["title"], abstract=info["abstract"])
                 p_pubs = p_pubs + 1
-                print("Procssed {} pubs".format(p_pubs))
+                print("Processed {} pubs".format(p_pubs))
     db.close(session)
     return()
 
