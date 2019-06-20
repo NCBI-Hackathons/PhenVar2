@@ -36,7 +36,7 @@ def update_snps(session):
             for p in pubs:
                 if not db.check_snp(session=session, id=s, pub=p):
                     db.add_snp(session, s, p)
-                    print("snp not in database; adding")
+                    # print("snp not in database; adding")
 
     return()
 
@@ -50,7 +50,7 @@ def update_publications(session):
         if not db.check_publication(session=session, id=pmid):
             info = get_publication(pmid)
             db.add_publication(session, id=pmid, title=info["title"], abstract=info["abstract"])
-            print("publication not in database; adding")
+            # print("publication not in database; adding")
         p_pubs += 1
         print("Processed {} pubs".format(p_pubs))
     return()
@@ -83,7 +83,8 @@ commands = {
     "--help": help,
     "-h": help,
     "initialize": initialize,
-}
+    "update_snps": update_snps,
+    }
 
 if len(argv) == 2 and argv[1] in commands:
     commands[argv[1]]()

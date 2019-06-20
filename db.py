@@ -38,12 +38,14 @@ def create_tables(engine):
 
 def add_snp(session, rsid, publication_id):
     snp = Snp(rsid = rsid, publications = publication_id)
+    print("Adding snp: ", rsid, "|", publication_id)
     session.add(snp)
     session.commit()
     return()
 
 def add_publication(session, id, title, abstract):
     publication = Publication(id = id, title = title, abstract = abstract)
+    print("Adding publication: ", id, "|", title, "|", abstract)
     session.add(publication)
     session.commit()
     return()
