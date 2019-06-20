@@ -4,13 +4,43 @@ import ncbiutils
 from lxml import etree
 import db
 import time
+from flask import Flask, jsonify
+from flask_restful import Resource, Api, reqparse, abort
+import json
+
+app = Flask(__name__)
+api = Api(app)
+
+parser = reqparse.RequestParser()
+# parser.add_argument('Snp')
+
+engine, session = db.create("sqlite:///db.sqlite3")
+
+class Publication(Resource):
+    def get(self, pmid):
+        abort_if_no_pub(pmid)
+        return jsonify(session.query(db.Publication).filter_by(pmid=pmid).scalar().as_dict())
+
+class Snp(Resource):
+    def get(self, rsid):
+        abort_if_no_snp(rsid)
+        return jsonify(session.query(db.Snp).filter_by(rsid=rsid).scalar().as_dict())
+
+
+def abort_if_no_pub(pmid):
+    if session.query(db.Publication).filter_by(pmid=pmid).scalar() == None:
+        abort(404, message="Publication pm{} not found".format(pmid))
+
+def abort_if_no_snp(rsid):
+    if session.query(db.Snp).filter_by(rsid=rsid).scalar() == None:
+        abort(404, message="SNP rs{} not found".format(rsid))
 
 """
 Finds all rsids that are explicitly cited in pubmed
 and returns a list
 """
 def get_complete_rsids():
-    results = ncbiutils.esearch(db="snp", retmode="json", retmax=100, retstart=0, term='snp_pubmed_cited[sb]', api_key="7c0213f7c513fa71fe2cb65b4dfefa76fb09")
+    results = ncbiutils.esearch(db="snp", retmode="json", retmax=1000, retstart=0, term='snp_pubmed_cited[sb]', api_key="7c0213f7c513fa71fe2cb65b4dfefa76fb09")
     rsidlist = results["esearchresult"]["idlist"]
     return(rsidlist)
 
@@ -53,8 +83,7 @@ def get_publication(pmid):
     items = { "title": titles, "abstract": abstracts, }
     return(items)
 
-def main():
-    return()
+api.add_resource(Snp, '/snps/<rsid>')
 
 if __name__ == '__main__':
-    main()
+    app.run(debug=True)

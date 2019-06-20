@@ -25,17 +25,22 @@ def initialize():
     for s in snps:
         time.sleep(.1)
         pubs = get_pmids(s)
+        print("got pmids.")
         if len(pubs) > 0:
             p_snps = p_snps + 1
             print("Processed {} snps".format(p_snps))
             for p in pubs:
                 if not db.check_snp(session=session, id=s, pub=p):
+                    print('no existing snp')
                     db.add_snp(session, s, p)
                 if not db.check_publication(session=session, id=p):
+                    print('no existing pub')
                     info = get_publication(p)
                     db.add_publication(session, id=p, title=info["title"], abstract=info["abstract"])
                 p_pubs = p_pubs + 1
                 print("Processed {} pubs".format(p_pubs))
+        else:
+            print("no pubs")
     db.close(session)
     return()
 

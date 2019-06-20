@@ -13,11 +13,27 @@ class Publication(Base):
     abstract = Column(String(250))
     rsids = Column(Integer)
 
+    def as_dict(self):
+        return {
+            'type': 'publication',
+            'pmid': 'pm{}'.format(self.id),
+            'title': self.title,
+            'abstract': self.abstract,
+            'rsids': self.rsids,
+        }
+
 class Snp(Base):
     __tablename__ = 'snp'
     id = Column(Integer, primary_key=True, autoincrement=True)
     rsid = Column(Integer)
     publications = Column(Integer, ForeignKey('publication.id'))
+
+    def as_dict(self):
+        return {
+            'type': 'SNP',
+            'rsid': 'rs{}'.format(self.rsid),
+            'publications': self.publications,
+        }
 
 def create(database):
     # an engine that the session will use for resources
@@ -60,6 +76,7 @@ def check_snp(session, id, pub):
     snp = session.query(Snp).filter_by(rsid=id).filter_by(publications=pub).scalar()
     # snp = session.query(Snp).filter(and_(rsid=id, publications == pub)).scalar()
     if snp == None:
+        print("snp doesn't exist")
         return(False)
     return(True)
 
