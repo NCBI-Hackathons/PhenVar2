@@ -2,7 +2,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, Boolean
 from sqlalchemy import Index
 from sqlalchemy.orm import relationship, backref, sessionmaker
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 
 Base = declarative_base()
 
@@ -67,6 +67,22 @@ def get_snp_rows(session):
     query = session.query(Snp)
     rows = query.all()
     return(rows)
+
+def result_dict(r):
+    return dict(zip(r.keys(), r))
+
+def result_dicts(rs):
+    return list(map(result_dict, rs))
+
+def table_dump(session, table):
+    if table == 'publication':
+        stmt = select('*').select_from(Publication)
+    elif table == 'snp':
+        stmt = select('*').select_from(Snp)
+    result = session.execute(stmt).fetchall()
+    print(result_dicts(result))
+    return()
+
 
 def close(conn):
     conn.close()

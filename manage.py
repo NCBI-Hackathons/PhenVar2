@@ -3,14 +3,16 @@ import db
 from phenvar import get_complete_rsids, get_pmids, get_publication
 import time
 from sys import argv
+from sqlalchemy import select
 
 
 help_text = """USAGE:
 ./manage.py <command>
  commands:
     - initialize    creates tables in database, should only be run once
+    - update_snps   gets rsids and populates database
+    - update_publications   gets publications and populates database
 """
-
 
 def help():
     print(help_text)
@@ -21,6 +23,21 @@ def initialize():
     update_snps(session)
     update_publications(session)
     db.close(session)
+
+def init_session():
+    engine, session = db.create("sqlite:///db.sqlite3")
+    db.create_tables(engine)
+    return(session)
+
+def dump_publication():
+    session = init_session()
+    db.table_dump(session, 'publication')
+    return()
+
+def dump_snp():
+    session = init_session()
+    db.table_dump(session, 'snp')
+    return()
 
 def update_snps(session):
     p_snps = 0
@@ -84,6 +101,9 @@ commands = {
     "-h": help,
     "initialize": initialize,
     "update_snps": update_snps,
+    "update_publications": update_publications,
+    "dump_publication": dump_publication,
+    "dump_snp": dump_snp
     }
 
 if len(argv) == 2 and argv[1] in commands:
