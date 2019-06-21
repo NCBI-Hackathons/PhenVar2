@@ -14,7 +14,7 @@ class Publication(Base):
     rsids = Column(Integer)
 
 class Snp(Base):
-    __tablename__ = 'snp'
+    __tablename__ = 'snp_publications'
     id = Column(Integer, primary_key=True, autoincrement=True)
     rsid = Column(Integer)
     publications = Column(Integer, ForeignKey('publication.id'))
@@ -62,6 +62,15 @@ def check_snp(session, id, pub):
     if snp == None:
         return(False)
     return(True)
+
+def check_snp_duplicates(session, id, pub):
+    entries = session.query(Snp).filter_by(rsid=id).filter_by(publications=pub).count()
+    return(entries)
+
+def all_filtered_snps(session, id, pub):
+    query = session.query(Snp).filter_by(rsid=id).filter_by(publications=pub)
+    rows = query.all()
+    return(rows)
 
 def get_snp_rows(session):
     query = session.query(Snp)

@@ -43,6 +43,31 @@ def dump_snp():
     db.close(session)
     return()
 
+def remove_duplicates_snps():
+    print("remove_duplicates called")
+    session = init_session()
+    rows = db.get_snp_rows(session)
+    for row in rows:
+        # print("row type", type(row))
+        # print(row.rsid)
+        # print(row.publications)
+        entries = db.check_snp_duplicates(session, row.rsid, row.publications)
+        if entries > 1:
+            print("duplicate found")
+            items = db.all_filtered_snps(session, row.rsid, row.publications)
+            count = 0
+            for item in items:
+                if count == 0:
+                    count += 1
+                else:
+                    print("deleting ", item)
+                    session.delete(item)
+                    session.commit()
+                    
+        else:
+            print("not a duplicate", entries)
+    return()
+
 def update_snps():
     session = init_session()
     p_snps = 0
@@ -56,8 +81,9 @@ def update_snps():
             print("Processed {} snps".format(p_snps))
             # if entries not in db, add
             for p in pubs:
-                if not db.check_snp(session=session, id=s, pub=p):
-                    db.add_snp(session, s, p)
+            #     if not db.check_snp(session=session, id=s, pub=p):
+            #         db.add_snp(session, s, p)
+                db.add_snp(session, s, p)
                     # print("snp not in database; adding")
     db.close(session)
     return()
@@ -110,7 +136,8 @@ commands = {
     "update_snps": update_snps,
     "update_publications": update_publications,
     "dump_publication": dump_publication,
-    "dump_snp": dump_snp
+    "dump_snp": dump_snp,
+    "remove_duplicates_snps": remove_duplicates_snps
     }
 
 if len(argv) == 2 and argv[1] in commands:
