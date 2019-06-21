@@ -33,12 +33,23 @@ class Snp(Resource):
         # List of pub objects that registered this SNP
         pubs = [session.query(db.Publication).filter_by(id=snp.publications).scalar() for snp in snps]
         # Just converting each pub to a dict for JSONifying
-        pubs_dict = {int(pub.id): pub.as_dict() for pub in pubs}
+        # pubs_dict = {int(pub.id): pub.as_dict() for pub in pubs}
+
+        pubs_list = [pub.as_dict() for pub in pubs]
+
         # Add SNP objects that each publication registered
-        for pub in pubs_dict.items():
+        # for pub in pubs_dict.items():
+
+        for pub in pubs_list:
+
             # pub[1] is the tuple elem with the pubs_dict.
-            pub[1]['snps'] = {snp.rsid: snp.as_dict() for snp in session.query(db.Snp).filter_by(publications=pub[1]['pmid'])}
-        return jsonify({'publications': pubs_dict})
+            # pub[1]['snps'] = {snp.rsid: snp.as_dict() for snp in session.query(db.Snp).filter_by(publications=pub[1]['pmid'])}
+
+            pub['snps'] = [snp.as_dict() for snp in session.query(db.Snp).filter_by(publications=pub['pmid'])]
+
+        # return jsonify({'publications': pubs_dict})
+
+        return jsonify({'publications': pubs_list})
 
 
 def abort_if_no_pub(pmid):
