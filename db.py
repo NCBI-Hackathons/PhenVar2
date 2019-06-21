@@ -15,11 +15,10 @@ class Publication(Base):
 
     def as_dict(self):
         return {
-            'type': 'publication',
-            'pmid': 'pm{}'.format(self.id),
+            'id': self.id,
             'title': self.title,
             'abstract': self.abstract,
-            'rsids': self.rsids,
+            'rsids (actually pmid)': self.rsids,
         }
 
 class Snp(Base):
@@ -30,7 +29,6 @@ class Snp(Base):
 
     def as_dict(self):
         return {
-            'type': 'SNP',
             'rsid': 'rs{}'.format(self.rsid),
             'publications': self.publications,
         }
@@ -98,7 +96,7 @@ def table_dump(session, table):
         stmt = select('*').select_from(Snp)
     result = session.execute(stmt).fetchall()
     print(result_dicts(result))
-    return()
+    return(result)
 
 
 def close(conn):

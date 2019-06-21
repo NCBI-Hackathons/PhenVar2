@@ -11,7 +11,8 @@ import json
 app = Flask(__name__)
 api = Api(app)
 
-parser = reqparse.RequestParser()
+# Arg parsing mostly for multiple args/a POST request.
+# parser = reqparse.RequestParser()
 # parser.add_argument('Snp')
 
 engine, session = db.create("sqlite:///db.sqlite3")
@@ -19,20 +20,29 @@ engine, session = db.create("sqlite:///db.sqlite3")
 class Publication(Resource):
     def get(self, pmid):
         abort_if_no_pub(pmid)
-        return jsonify(session.query(db.Publication).filter_by(pmid=pmid).scalar().as_dict())
+        # snps = session.query(db.Snp).filter_by(publications=pmid)
+        # pubs = session.query(db.Publication).filter_by(rsids=pmid)
+        return jsonify(session.query(db.Publication).filter_by(rsids=pmid).scalar().as_dict())
 
 class Snp(Resource):
     def get(self, rsid):
         abort_if_no_snp(rsid)
-        return jsonify(session.query(db.Snp).filter_by(rsid=rsid).scalar().as_dict())
+        snps = session.query(db.Snp).filter_by(rsid=rsid)
+        pubs = session.query(db.Publication).filter_by(rsids=snps.first().publications)
+        # Publications that registered the SNP
+        pubs_dict = {int(pub.id): pub.as_dict() for pub in pubs}
+        # Add SNP objects that each publication registered
+        for pub in pubs_dict.items():
+            pub[1]['snps'] = {snp.rsid: snp.as_dict() for snp in session.query(db.Snp).filter_by(publications=pub[1]['rsids'])}
+        return jsonify({'publications': pubs_dict})
 
 
 def abort_if_no_pub(pmid):
-    if session.query(db.Publication).filter_by(pmid=pmid).scalar() == None:
-        abort(404, message="Publication pm{} not found".format(pmid))
+    if session.query(db.Publication).filter_by(rsids=pmid).first() == None:
+        abort(404, message="Publication {} not found".format(pmid))
 
 def abort_if_no_snp(rsid):
-    if session.query(db.Snp).filter_by(rsid=rsid).scalar() == None:
+    if session.query(db.Snp).filter_by(rsid=rsid).first() == None:
         abort(404, message="SNP rs{} not found".format(rsid))
 
 """
@@ -83,7 +93,8 @@ def get_publication(pmid):
     items = { "title": titles, "abstract": abstracts, }
     return(items)
 
-api.add_resource(Snp, '/snps/<rsid>')
+api.add_resource(Snp, '/api/v1/snp/<rsid>')
+api.add_resource(Publication, '/api/v1/pub/<pmid>')
 
 if __name__ == '__main__':
     app.run(debug=True)
