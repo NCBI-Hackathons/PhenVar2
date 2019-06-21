@@ -30,8 +30,9 @@ class Snp(Resource):
     def get(self, rsid):
         abort_if_no_snp(rsid)
         snps = session.query(db.Snp).filter_by(rsid=rsid)
-        pubs = session.query(db.Publication).filter_by(id=snps.first().publications)
-        # Publications that registered the SNP
+        # List of pub objects that registered this SNP
+        pubs = [session.query(db.Publication).filter_by(id=snp.publications).scalar() for snp in snps]
+        # Just converting each pub to a dict for JSONifying
         pubs_dict = {int(pub.id): pub.as_dict() for pub in pubs}
         # Add SNP objects that each publication registered
         for pub in pubs_dict.items():
