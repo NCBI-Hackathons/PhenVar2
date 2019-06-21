@@ -11,7 +11,7 @@ class Publication(Base):
     id = Column(Integer, primary_key = True)
     title = Column(String(250))
     abstract = Column(String(250))
-    rsids = Column(Integer)
+    # rsids = Column(Integer)
 
     def as_dict(self):
         return {
@@ -22,7 +22,7 @@ class Publication(Base):
         }
 
 class Snp(Base):
-    __tablename__ = 'snp'
+    __tablename__ = 'snp_publications'
     id = Column(Integer, primary_key=True, autoincrement=True)
     rsid = Column(Integer)
     publications = Column(Integer, ForeignKey('publication.id'))
@@ -58,7 +58,7 @@ def add_snp(session, rsid, publication_id):
     return()
 
 def add_publication(session, id, title, abstract):
-    publication = Publication(rsids = id, title = title, abstract = abstract)
+    publication = Publication(id = id, title = title, abstract = abstract)
     print("Adding publication: ", id, "|", title, "|", abstract)
     session.add(publication)
     session.commit()
@@ -66,7 +66,7 @@ def add_publication(session, id, title, abstract):
 
 def check_publication(session, id):
     # publication = session.query(Publication).filter(Publication.id == id)
-    publication = session.query(Publication).filter_by(rsids=id).scalar()
+    publication = session.query(Publication).filter_by(id=id).scalar()
     if publication == None:
         return(False)
     return(True)
@@ -77,6 +77,15 @@ def check_snp(session, id, pub):
         print("snp doesn't exist")
         return(False)
     return(True)
+
+def check_snp_duplicates(session, id, pub):
+    entries = session.query(Snp).filter_by(rsid=id).filter_by(publications=pub).count()
+    return(entries)
+
+def all_filtered_snps(session, id, pub):
+    query = session.query(Snp).filter_by(rsid=id).filter_by(publications=pub)
+    rows = query.all()
+    return(rows)
 
 def get_snp_rows(session):
     query = session.query(Snp)
