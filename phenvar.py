@@ -17,28 +17,31 @@ api = Api(app)
 
 engine, session = db.create("sqlite:///db.sqlite3")
 
+# Resource for querying API by publication PMID
 class Publication(Resource):
     def get(self, pmid):
         abort_if_no_pub(pmid)
         # snps = session.query(db.Snp).filter_by(publications=pmid)
-        # pubs = session.query(db.Publication).filter_by(rsids=pmid)
-        return jsonify(session.query(db.Publication).filter_by(rsids=pmid).scalar().as_dict())
+        # pubs = session.query(db.Publication).filter_by(id=pmid)
+        return jsonify(session.query(db.Publication).filter_by(id=pmid).scalar().as_dict())
 
+# Resource for querying API by SNP RSID
 class Snp(Resource):
     def get(self, rsid):
         abort_if_no_snp(rsid)
         snps = session.query(db.Snp).filter_by(rsid=rsid)
-        pubs = session.query(db.Publication).filter_by(rsids=snps.first().publications)
+        pubs = session.query(db.Publication).filter_by(id=snps.first().publications)
         # Publications that registered the SNP
         pubs_dict = {int(pub.id): pub.as_dict() for pub in pubs}
         # Add SNP objects that each publication registered
         for pub in pubs_dict.items():
-            pub[1]['snps'] = {snp.rsid: snp.as_dict() for snp in session.query(db.Snp).filter_by(publications=pub[1]['rsids'])}
+            # pub[1] is the tuple elem with the pubs_dict.
+            pub[1]['snps'] = {snp.rsid: snp.as_dict() for snp in session.query(db.Snp).filter_by(publications=pub[1]['pmid'])}
         return jsonify({'publications': pubs_dict})
 
 
 def abort_if_no_pub(pmid):
-    if session.query(db.Publication).filter_by(rsids=pmid).first() == None:
+    if session.query(db.Publication).filter_by(id=pmid).first() == None:
         abort(404, message="Publication {} not found".format(pmid))
 
 def abort_if_no_snp(rsid):

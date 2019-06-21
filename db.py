@@ -15,10 +15,10 @@ class Publication(Base):
 
     def as_dict(self):
         return {
-            'id': self.id,
+            'pmid': self.id,
             'title': self.title,
             'abstract': self.abstract,
-            'rsids (actually pmid)': self.rsids,
+            # 'rsids (actually pmid)': self.rsids,
         }
 
 class Snp(Base):
@@ -35,7 +35,7 @@ class Snp(Base):
 
 def create(database):
     # an engine that the session will use for resources
-    engine = create_engine(database)
+    engine = create_engine(database, connect_args={'check_same_thread': False})
     # create a configured Session class
     Session = sessionmaker(bind=engine)
     # create a session
@@ -74,7 +74,7 @@ def check_publication(session, id):
 def check_snp(session, id, pub):
     snp = session.query(Snp).filter_by(rsid=id).filter_by(publications=pub).scalar()
     if snp == None:
-        print("snp doesn't exist")
+        print("SNP checked - not in db")
         return(False)
     return(True)
 
