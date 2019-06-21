@@ -51,7 +51,6 @@ def add_publication(session, id, title, abstract):
     return()
 
 def check_publication(session, id):
-    # publication = session.query(Publication).filter(Publication.id == id)
     publication = session.query(Publication).filter_by(id=id).scalar()
     if publication == None:
         return(False)

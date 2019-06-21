@@ -14,6 +14,7 @@ help_text = """USAGE:
     - update_publications   gets publications and populates database
     - dump_publication  prints publication table
     - dump_snp  prints snp table
+    - remove_duplicates_snps    finds duplicate snp rows and removes them
 """
 
 def help():
