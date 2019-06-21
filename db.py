@@ -11,7 +11,7 @@ class Publication(Base):
     id = Column(Integer, primary_key = True)
     title = Column(String(250))
     abstract = Column(String(250))
-    rsids = Column(Integer)
+    # rsids = Column(Integer)
 
 class Snp(Base):
     __tablename__ = 'snp_publications'
@@ -52,7 +52,7 @@ def add_publication(session, id, title, abstract):
 
 def check_publication(session, id):
     # publication = session.query(Publication).filter(Publication.id == id)
-    publication = session.query(Publication).filter_by(rsids=id).scalar()
+    publication = session.query(Publication).filter_by(id=id).scalar()
     if publication == None:
         return(False)
     return(True)
