@@ -98,6 +98,7 @@ def update_publications():
         pmid = row.publications
         # check if pmid in db, add if not
         if not db.check_publication(session=session, id=pmid):
+            time.sleep(.1)
             info = get_publication(pmid)
             db.add_publication(session, id=pmid, title=info["title"], abstract=info["abstract"])
             # print("publication not in database; adding")
