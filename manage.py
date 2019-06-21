@@ -57,6 +57,7 @@ def remove_duplicates_snps():
             items = db.all_filtered_snps(session, row.rsid, row.publications)
             count = 0
             for item in items:
+                # keep the first entry found and delete all others
                 if count == 0:
                     count += 1
                 else:
@@ -64,8 +65,8 @@ def remove_duplicates_snps():
                     session.delete(item)
                     session.commit()
                     
-        else:
-            print("not a duplicate", entries)
+        # else:
+        #     print("not a duplicate", entries)
     return()
 
 def update_snps():
@@ -81,9 +82,9 @@ def update_snps():
             print("Processed {} snps".format(p_snps))
             # if entries not in db, add
             for p in pubs:
-            #     if not db.check_snp(session=session, id=s, pub=p):
-            #         db.add_snp(session, s, p)
-                db.add_snp(session, s, p)
+                if not db.check_snp(session=session, id=s, pub=p):
+                    db.add_snp(session, s, p)
+                # db.add_snp(session, s, p)
                     # print("snp not in database; adding")
     db.close(session)
     return()

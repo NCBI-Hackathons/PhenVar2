@@ -44,7 +44,7 @@ def add_snp(session, rsid, publication_id):
     return()
 
 def add_publication(session, id, title, abstract):
-    publication = Publication(rsids = id, title = title, abstract = abstract)
+    publication = Publication(id = id, title = title, abstract = abstract)
     print("Adding publication: ", id, "|", title, "|", abstract)
     session.add(publication)
     session.commit()
